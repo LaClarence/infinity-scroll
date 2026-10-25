@@ -1,87 +1,83 @@
-
 const imageContainer = document.getElementById('image-container');
 const loader = document.getElementById('loader');
+const scrollSentinel = document.getElementById('scroll-sentinel');
 
-let readyToLoadPhotos = false;
-let photosLoaded = 0;
-let totalPhotos = 0;
-let photos = [];
-let apiUrlCountQueryParam = 5;
+const INITIAL_COUNT = 5;
+const NEXT_COUNT = 30;
 
+let isLoading = false;
+let isFirstLoad = true;
 
-const API_KEY = '4Dbb6ju-Gyl_z931ljQsG152Q_iCuR5s424qbvfswkI';
-const apiUrl = `https://api.unsplash.com/photos/random/?client_id=${API_KEY}&count=${apiUrlCountQueryParam}`;
+// Build the Unsplash URL for each call, so the count can change between calls
+const buildApiUrl = (count) => {
+  const url = new URL('https://api.unsplash.com/photos/random/');
+  url.search = new URLSearchParams({ client_id: API_KEY, count });
+  return url;
+};
 
-
-// Check if all images were loaded
-function imageLoaded() {
-  photosLoaded++;
-  if (photosLoaded === totalPhotos) {
-    readyToLoadPhotos = true;
-    loader.hidden = true;
+// Fetch photos from the Unsplash API
+const fetchPhotos = async (count) => {
+  const response = await fetch(buildApiUrl(count));
+  if (!response.ok) {
+    throw new Error(`Unsplash API error: ${response.status} ${response.statusText}`);
   }
-}
+  return response.json();
+};
 
-// Helper method do set photo attributes
-function setAttributes(element, attributes) {
-  for (const key in attributes) {
-    element.setAttribute(key, attributes[key]);
-  }
-}
-
-// Create elements for links & photos, add to DOM
-function displayPhotos() {
-  photosLoaded = 0;
-  totalPhotos = photos.length;
-  photos.forEach((photo) => {
-    // Create <a> to link to unsplash
-    const item = document.createElement('a');
-    setAttributes(item, {
-      'href': photo.links.html,
-      'target': '_blank'
-    });
-
-    // Create figure to manage title of the photo
-    const figure = document.createElement('figure');
-
-    const img = document.createElement('img');
-    setAttributes(img, {
-      'src': photo.urls.regular,
-      'alt': photo.alt_description
-    });
-    // Event Listener, check when each is finished loading
-    img.addEventListener('load', imageLoaded);
-
-    const figcaption = document.createElement('figcaption');
-    figcaption.textContent = photo.alt_description;
-
-    figure.appendChild(img);
-    figure.appendChild(figcaption);
-    item.appendChild(figure);
-    imageContainer.appendChild(item);
-
+// Create <a><figure><img><figcaption></figure></a> for one photo
+const createPhotoElement = ({ links, urls, alt_description }) => {
+  const link = Object.assign(document.createElement('a'), {
+    href: links.html,
+    target: '_blank',
+    rel: 'noopener',
   });
-}
+  const img = Object.assign(document.createElement('img'), {
+    src: urls.regular,
+    alt: alt_description ?? 'Unsplash photo',
+  });
+  const figcaption = Object.assign(document.createElement('figcaption'), {
+    textContent: alt_description ?? '',
+  });
 
-// Fetch Photos from UNSPLASH API
-const getPhotos = async () => {
+  const figure = document.createElement('figure');
+  figure.append(img, figcaption);
+  link.append(figure);
+  return { link, img };
+};
+
+// Fetch a batch of photos, add them to the DOM and wait until they are loaded
+const loadMorePhotos = async () => {
+  if (isLoading) return;
+  isLoading = true;
+
   try {
-    const response = await fetch(apiUrl);
-    photos = await response.json();
-    displayPhotos();
+    const photos = await fetchPhotos(isFirstLoad ? INITIAL_COUNT : NEXT_COUNT);
+    isFirstLoad = false;
+
+    const elements = photos.map(createPhotoElement);
+    imageContainer.append(...elements.map(({ link }) => link));
+
+    // allSettled: a broken image must not block the infinite scroll
+    await Promise.allSettled(elements.map(({ img }) => img.decode()));
+    loader.hidden = true;
+
+    // Observe again: if the sentinel is still visible (large screen), the callback fires and loads more
+    observer.unobserve(scrollSentinel);
+    observer.observe(scrollSentinel);
   } catch (error) {
-    console.log(error);
+    console.error(error);
+  } finally {
+    isLoading = false;
   }
-}
+};
 
-// check to see if scroll near bottom of page, load More photos
-window.addEventListener('scroll', () => {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000 && readyToLoadPhotos) {
-    readyToLoadPhotos = false;
-    getPhotos();
-  }
-});
+// Load more photos when the sentinel at the bottom of the page comes within 1000px of the viewport
+const observer = new IntersectionObserver(
+  ([entry]) => {
+    if (entry.isIntersecting) loadMorePhotos();
+  },
+  { rootMargin: '0px 0px 1000px 0px' },
+);
 
-// Load first
-getPhotos();
-apiUrlCountQueryParam = 30;
+// Observing triggers a first callback, which does the initial load
+observer.observe(scrollSentinel);

@@ -11,3 +11,8 @@ Infinite Scroll of photos using Unsplash API
 ## Make scrolling infinite
 
 ![Scrolling photos from Unsplash site](/doc/Infinite+Scroll+Functionality.png).
+
+## Setup
+
+Copy `config.example.js` to `config.js` and put your Unsplash Access Key in it.
+`config.js` is ignored by Git, so the key is never committed.
