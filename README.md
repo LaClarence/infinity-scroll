@@ -5,12 +5,12 @@ Infinite Scroll of photos using Unsplash API
 
 ## Loading photos from Unsplash site
 
-![Loading photos from Unsplash site](/doc/Unsplash+Flowchart.png).
+![Loading photos from Unsplash site](doc/unsplash-flowchart.svg)
 
 
 ## Make scrolling infinite
 
-![Scrolling photos from Unsplash site](/doc/Infinite+Scroll+Functionality.png).
+![Scrolling photos from Unsplash site](doc/infinite-scroll.svg)
 
 ## Setup
 

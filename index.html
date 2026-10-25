@@ -12,12 +12,20 @@
 
 <body>
     <h1>Unsplash API - Infinite Scroll</h1>
+    <!-- Theme search, stays at the top while scrolling -->
+    <form class="search" id="search-form">
+        <input type="search" id="search-input" placeholder="Search a theme (e.g. mountains) and press Enter"
+            aria-label="Photo theme" autocomplete="off">
+        <p class="current-theme" id="current-theme">Random photos</p>
+    </form>
     <!-- Loader -->
     <div class="loader" id="loader">
         <img src="loader.svg" alt="loading">
     </div>
     <!-- Image container -->
     <div class="image-container" id="image-container"></div>
+    <!-- Message shown when no photo matches or loading fails -->
+    <p class="status" id="status" hidden></p>
     <!-- Sentinel watched by IntersectionObserver to load more photos -->
     <div id="scroll-sentinel"></div>
     <!-- Script -->

@@ -1,0 +1,88 @@
+<svg xml:space="preserve" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333"/>
+    </marker>
+    <style>
+      .fn { fill: #fff2cc; stroke: #d6b656; }
+      .data { fill: #d5e8d4; stroke: #82b366; }
+      .server { fill: #e1d5e7; stroke: #9673a6; }
+      .done { fill: #f5f5f5; stroke: #666; }
+      .line { fill: none; stroke: #333; stroke-width: 1.2; marker-end: url(#arrow); }
+      .code { font-family: Menlo, Consolas, monospace; font-size: 12px; white-space: pre; }
+      text { fill: #222; }
+    </style>
+  </defs>
+  <rect width="900" height="620" fill="#fff"/>
+  <text x="40" y="42" font-size="22">Unsplash API</text>
+
+  <!-- Left column: trigger and fetch -->
+  <rect class="fn" x="40" y="70" width="260" height="40" rx="6"/>
+  <text x="170" y="95" text-anchor="middle" class="code">observer.observe(scrollSentinel)</text>
+
+  <rect class="fn" x="40" y="140" width="260" height="50" rx="6"/>
+  <text x="170" y="161" text-anchor="middle">IntersectionObserver callback</text>
+  <text x="170" y="179" text-anchor="middle" class="code">if (entry.isIntersecting)</text>
+
+  <rect class="fn" x="40" y="220" width="260" height="40" rx="6"/>
+  <text x="170" y="245" text-anchor="middle" class="code">loadMorePhotos()</text>
+
+  <rect class="fn" x="40" y="290" width="260" height="50" rx="6"/>
+  <text x="170" y="311" text-anchor="middle" class="code">fetchPhotos(count)</text>
+  <text x="170" y="329" text-anchor="middle" class="code">fetch(buildApiUrl(count))</text>
+  <text x="170" y="362" text-anchor="middle" font-size="11" fill="#555">count: 5 the first time, then 30</text>
+
+  <rect class="server" x="40" y="540" width="260" height="40" rx="6"/>
+  <text x="170" y="565" text-anchor="middle">Unsplash API server</text>
+
+  <path class="line" d="M170,110 V138"/>
+  <path class="line" d="M170,190 V218"/>
+  <path class="line" d="M170,260 V288"/>
+  <path class="line" d="M170,372 V538"/>
+
+  <!-- Middle column: response -->
+  <rect class="fn" x="340" y="440" width="220" height="50" rx="6"/>
+  <text x="450" y="461" text-anchor="middle" class="code">if (!response.ok)</text>
+  <text x="450" y="479" text-anchor="middle" class="code">throw new Error(...)</text>
+
+  <rect class="data" x="340" y="340" width="220" height="50" rx="6"/>
+  <text x="450" y="361" text-anchor="middle" class="code">response.json()</text>
+  <text x="450" y="379" text-anchor="middle" class="code" font-weight="bold">= photos</text>
+
+  <path class="line" d="M300,560 H450 V492"/>
+  <path class="line" d="M450,440 V392"/>
+  <path class="line" d="M560,365 H580 V160 H598"/>
+
+  <!-- Right column: build DOM and wait -->
+  <rect class="fn" x="600" y="60" width="270" height="190" rx="14"/>
+  <text x="612" y="82" class="code" font-weight="bold">photos.map(createPhotoElement)</text>
+  <text x="612" y="108" class="code">&lt;a href="links.html"</text>
+  <text x="612" y="124" class="code">   target="_blank" rel="noopener"&gt;</text>
+  <text x="612" y="142" class="code">  &lt;figure&gt;</text>
+  <text x="612" y="160" class="code">    &lt;img src="urls.regular"</text>
+  <text x="612" y="176" class="code">      alt="alt_description</text>
+  <text x="612" y="192" class="code">           ?? 'Unsplash photo'"&gt;</text>
+  <text x="612" y="210" class="code">    &lt;figcaption&gt;…&lt;/figcaption&gt;</text>
+  <text x="612" y="228" class="code">  &lt;/figure&gt;</text>
+  <text x="612" y="244" class="code">&lt;/a&gt;</text>
+
+  <rect class="fn" x="600" y="280" width="270" height="40" rx="6"/>
+  <text x="735" y="305" text-anchor="middle" class="code">imageContainer.append(...links)</text>
+
+  <rect class="fn" x="600" y="350" width="270" height="50" rx="6"/>
+  <text x="735" y="371" text-anchor="middle" class="code">await Promise.allSettled(</text>
+  <text x="735" y="389" text-anchor="middle" class="code">  imgs.map(img =&gt; img.decode()))</text>
+
+  <rect class="fn" x="600" y="430" width="270" height="60" rx="6"/>
+  <text x="735" y="451" text-anchor="middle" class="code">loader.hidden = true</text>
+  <text x="735" y="469" text-anchor="middle">re-observe the sentinel: loads</text>
+  <text x="735" y="485" text-anchor="middle">again if it is still visible</text>
+
+  <rect class="done" x="600" y="540" width="270" height="40" rx="6"/>
+  <text x="735" y="565" text-anchor="middle" font-style="italic">User sees photos!</text>
+
+  <path class="line" d="M735,250 V278"/>
+  <path class="line" d="M735,320 V348"/>
+  <path class="line" d="M735,400 V428"/>
+  <path class="line" d="M735,490 V538"/>
+</svg>
