@@ -1,0 +1,51 @@
+# Publish the site on GitHub Pages at each push on main.
+# config.js is not in the repo: it is generated from the UNSPLASH_ACCESS_KEY secret.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deployment at a time; a newer push replaces the one waiting
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create config.js from the secret
+        env:
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+        run: |
+          if [ -z "$UNSPLASH_ACCESS_KEY" ]; then
+            echo "::error::Secret UNSPLASH_ACCESS_KEY is missing"
+            exit 1
+          fi
+          printf "const API_KEY = '%s';\n" "$UNSPLASH_ACCESS_KEY" > config.js
+
+      - name: Keep only the files the site needs
+        run: |
+          mkdir _site
+          cp index.html script.js config.js style.css loader.svg favicon.png _site/
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
