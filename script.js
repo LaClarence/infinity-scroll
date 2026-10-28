@@ -18,7 +18,7 @@ let searchId = 0;
 // Build the Unsplash URL for each call, so the count and the theme can change between calls
 const buildApiUrl = (count) => {
   const url = new URL('https://api.unsplash.com/photos/random/');
-  const params = new URLSearchParams({ client_id: API_KEY, count });
+  const params = new URLSearchParams({ client_id: API_KEY, count, orientation: 'landscape' });
   if (query) params.set('query', query);
   url.search = params;
   return url;
